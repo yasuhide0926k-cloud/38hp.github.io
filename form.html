@@ -70,11 +70,36 @@
       document.getElementById('time-group').style.display = document.getElementById('t1').checked ? 'block' : 'none';
     }
 
-    async function submitReservation() {
-      const btn = document.getElementById('submit-btn');
-      btn.disabled = true;
-      btn.innerText = "通信中...";
+async function submitReservation() {
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerText = "通信中...";
 
+  const params = new URLSearchParams({
+    action: 'reserve',
+    type: document.querySelector('input[name="type"]:checked').value,
+    time: document.getElementById('time-select').value,
+    count: document.getElementById('count-select').value
+  });
+
+  // mode: 'no-cors' ではなくデフォルト(cors)で実行
+  try {
+    const res = await fetch(`${GAS_URL}?${params.toString()}`);
+    const data = await res.json(); // ここでエラーになる場合はGASのCORS設定がまだ適用されていません
+
+    if (data.success) {
+       // 成功時の処理...
+    } else {
+       alert("エラー: " + data.message);
+    }
+  } catch (e) {
+    console.error(e);
+    alert("通信エラーが発生しました。");
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "予約を確定する";
+  }
+}
       const params = new URLSearchParams({
         action: 'reserve',
         type: document.querySelector('input[name="type"]:checked').value,
