@@ -1,1 +1,263 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文化祭 38HR サイト</title>
+  <style>
+    /* 【カラーカスタマイズエリア】
+       クラスのテーマカラーに合わせて、ここのカラーコードを自由に変更できます！
+    */
+    :root {
+      --main-color: #31708f;         /* ヘッダータイトル・詳細ボタン（青系） */
+      --main-color-hover: #245269;   /* 詳細ボタンを押したときの色 */
+      --accent-color: #3c763d;       /* 予約フォームボタン（緑系） */
+      --accent-color-hover: #2b542c; /* 予約フォームボタンを押したときの色 */
+      --bg-color: #ededf0;           /* PCなどの大画面時に左右に見える背景色 */
+      --card-bg: rgba(255, 255, 255, 0.95); /* カードの背景（白・半透明） */
+    }
 
+    /* 全体のリセット設定 */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+      background-color: var(--bg-color);
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      min-height: 100dvh; /* スマホブラウザのツールバー伸縮を完全に吸収する動的単位 */
+      width: 100%;
+    }
+
+    /* 【画面比率対応】メインコンテナ
+       縦画面・横画面どちらでも、間延びせずスマートフォンのような見やすい枠枠を維持します。
+    */
+    .phone-container {
+      width: 100%;
+      max-width: 480px; /* タブレットやPCで見た時の最大幅 */
+      min-height: 100vh;
+      min-height: 100dvh;
+      background-color: #ffffff;
+      box-shadow: 0 0 30px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* ヘッダーエリア：38HR タイトル
+       clamp()を使い、画面の高さ(vh)に応じて適切なサイズに無段階可変します。
+    */
+    header {
+      background-color: #ffffff;
+      padding: clamp(12px, 3vh, 24px) 20px;
+      text-align: center;
+      border-bottom: 1px solid #e1e8ed;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    header h1 {
+      font-size: clamp(20px, 4vh, 32px);
+      color: var(--main-color);
+      letter-spacing: 0.15em;
+      font-weight: bold;
+    }
+
+    /* 写真背景のメインコンテンツエリア */
+    .main-content {
+      flex: 1;
+      /* 背景画像（実際の写真URLを url('〜') に差し替えてご使用ください） */
+      background-image: linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0.2)), url('https://picsum.photos/id/102/1200/1600');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      padding: clamp(15px, 3vh, 30px) 20px;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(15px, 3vh, 25px);
+    }
+
+    /* コンテンツカード（視認性を極限まで高めた白い半透明の枠） */
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      padding: clamp(15px, 3vh, 25px) 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      border: 1px solid rgba(49, 112, 143, 0.15);
+    }
+
+    /* 説明文タイトルと本文 */
+    .card h2 {
+      font-size: clamp(16px, 2.4vh, 20px);
+      color: #222;
+      margin-bottom: 12px;
+      border-bottom: 3px solid var(--main-color);
+      padding-bottom: 4px;
+      display: inline-block;
+    }
+    
+    .card p {
+      font-size: clamp(14px, 1.8vh, 16px);
+      line-height: 1.6;
+      color: #444;
+      text-align: justify;
+    }
+
+    /* ボタン・リンクの配置コンテナ */
+    .btn-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ボタンの共通スタイル（ピクセルを排除しclampでマルチ対応） */
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: clamp(12px, 2vh, 16px) 15px;
+      background-color: var(--main-color);
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: clamp(15px, 2vh, 17px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+      transition: background-color 0.2s, transform 0.1s, opacity 0.2s;
+    }
+    
+    /* PC表示でのホバー制御 */
+    @media (hover: hover) {
+      .btn:hover {
+        background-color: var(--main-color-hover);
+        opacity: 0.95;
+      }
+    }
+    /* タップ・クリックした瞬間の心地よい縮小エフェクト */
+    .btn:active {
+      transform: scale(0.98);
+      background-color: var(--main-color-hover);
+    }
+
+    /* フォーム用ボタンのカラー適用 */
+    .btn-form {
+      background-color: var(--accent-color);
+    }
+    @media (hover: hover) {
+      .btn-form:hover {
+        background-color: var(--accent-color-hover);
+      }
+    }
+    .btn-form:active {
+      background-color: var(--accent-color-hover);
+    }
+
+    /* 【横画面スマホ・極端に高さの低い特殊端末用のブレイクポイント】
+       端末を横向きにして縦幅が窮屈になった場合でも、自動で最適化してスクロールしやすくします。
+    */
+    @media (orientation: landscape) and (max-height: 480px) {
+      .phone-container {
+        max-width: 100%; /* 横画面時はスクロール追従のため横幅制限を解除 */
+      }
+      header {
+        padding: 8px 20px;
+      }
+      .main-content {
+        padding: 15px;
+        gap: 15px;
+      }
+      .card {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="phone-container">
+    <header>
+      <h1>38HR サイト</h1>
+    </header>
+
+    <div class="main-content">
+      
+      <div class="card">
+        <h2>38HR プロジェクト概要</h2>
+        <p>今年の38HRの模擬店は、ベイマックスのハッピーライドをモチーフとした”38HRいちかわハッピーライド”実施します！</p>
+        <h5>入場には事前登録が必要です。</h5>
+      </div>
+     
+
+
+      <div class="card">
+        <h2>模擬店時間指定枠の空き状況を見る</h2>
+        <div class="btn-container">
+          <a href="https://wondrous-tanuki-81bb33.netlify.app" target="_blank" class="btn">
+            詳細はこちら
+          </a>
+        </div>
+      </div>
+         <script>
+      function openRatioWindow(event, widthRatio, heightRatio) {
+       event.preventDefault(); // 本来のページ遷移をキャンセル
+  
+       // 画面サイズからピクセル数を計算
+      const w = window.innerWidth * widthRatio;
+      const h = window.innerHeight * heightRatio;
+  
+      // 画面中央に配置するための座標計算
+      const x = (window.innerWidth - w) / 2;
+      const y = (window.innerHeight - h) / 2;
+  
+       window.open(event.currentTarget.href, 'subwin', `width=${w},height=${h},left=${x},top=${y},resizable=yes,scrollbars=yes`);
+       }
+    </script>
+    
+     <div class="card">
+      <a href="https://yasuhide0926k-cloud.github.io/38hp.github.io/attention" onclick="openRatioWindow(event, 0.8, 0.6)" class="btn">
+      予約に関する注意事項(初回登録時は必ず読んでください)
+      </a>  
+     </div>
+
+     <script>
+      function openRatioWindow(event, widthRatio, heightRatio) {
+       event.preventDefault(); // 本来のページ遷移をキャンセル
+  
+       // 画面サイズからピクセル数を計算
+      const w = window.innerWidth * widthRatio;
+      const h = window.innerHeight * heightRatio;
+  
+      // 画面中央に配置するための座標計算
+      const x = (window.innerWidth - w) / 2;
+      const y = (window.innerHeight - h) / 2;
+  
+       window.open(event.currentTarget.href, 'subwin', `width=${w},height=${h},left=${x},top=${y},resizable=yes,scrollbars=yes`);
+       }
+    </script>
+
+      <div class="card">
+        <h2>事前予約</h2>
+        <div class="btn-container">
+          <a href="https://forms.gle/9pZqKJtZrYi14Mmp7" target="_blank" class="btn btn-form">
+            時間指定券予約フォーム
+          </a>
+          <a href="https://forms.gle/k3uBSuKagjvDPqtC6" target="_blank" class="btn btn-form">
+            当日券予約フォーム
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>
