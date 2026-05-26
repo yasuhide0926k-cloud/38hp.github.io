@@ -3,14 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>38HR 展示の注意事項</title>
+  <title>文化祭 38HR サイト</title>
+  
+  <meta property="og:title" content="38HR いちかわハッピーライド">
+  <meta property="og:description" content="今年の38HRの模擬店は、ベイマックスのハッピーライドをモチーフとしたアトラクションを実施します！">
+  <meta property="og:type" content="website">
+
   <style>
-    /* メインサイトと統一したカラーパレット */
+    /* 【カラーカスタマイズエリア】
+       クラスのテーマカラーに合わせて、ここのカラーコードを自由に変更できます！
+    */
     :root {
-      --main-color: #31708f;         /* テーマカラー（青系） */
-      --bg-color: #ededf0;           /* PC表示時の背景色 */
+      --main-color: #31708f;         /* ヘッダータイトル・詳細ボタン（青系） */
+      --main-color-hover: #245269;   /* 詳細ボタンを押したときの色 */
+      --accent-color: #3c763d;       /* 予約フォームボタン（緑系） */
+      --accent-color-hover: #2b542c; /* 予約フォームボタンを押したときの色 */
+      --bg-color: #ededf0;           /* PCなどの大画面時に左右に見える背景色 */
       --card-bg: rgba(255, 255, 255, 0.95); /* カードの背景（白・半透明） */
-      --alert-color: #a94442;       /* 禁止事項・警告用のアクセント（赤系） */
+      --warn-color: #d9534f;         /* 警告・重要なお知らせ用の赤系 */
     }
 
     /* 全体のリセット設定 */
@@ -28,14 +38,14 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      min-height: 100dvh; /* スマホのツールバー対策 */
+      min-height: 100dvh; /* スマホブラウザのツールバー伸縮を完全に吸収する動的単位 */
       width: 100%;
     }
 
-    /* メインサイトと完全にサイズを合わせたコンテナ */
+    /* 【画面比率対応】メインコンテナ */
     .phone-container {
       width: 100%;
-      max-width: 480px;
+      max-width: 480px; /* タブレットやPCで見た時の最大幅 */
       min-height: 100vh;
       min-height: 100dvh;
       background-color: #ffffff;
@@ -45,7 +55,7 @@
       position: relative;
     }
 
-    /* ヘッダー */
+    /* ヘッダーエリア：38HR タイトル */
     header {
       background-color: #ffffff;
       padding: clamp(12px, 3vh, 24px) 20px;
@@ -57,16 +67,17 @@
     }
     
     header h1 {
-      font-size: clamp(18px, 3.5vh, 26px);
+      font-size: clamp(20px, 4vh, 32px);
       color: var(--main-color);
+      letter-spacing: 0.15em;
       font-weight: bold;
-      letter-spacing: 0.05em;
     }
 
-    /* コンテンツエリア（背景写真を薄く透過させて可読性を確保） */
+    /* 写真背景のメインコンテンツエリア */
     .main-content {
       flex: 1;
-      background-image: linear-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.4)), url('https://picsum.photos/id/102/1200/1600');
+      /* 背景画像（GitHub上の画像パス、または外部URLに差し替えてください） */
+      background-image: linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0.2)), url('https://picsum.photos/id/102/1200/1600');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -76,7 +87,7 @@
       gap: clamp(15px, 3vh, 25px);
     }
 
-    /* 基本カード */
+    /* コンテンツカード */
     .card {
       background-color: var(--card-bg);
       border-radius: 16px;
@@ -85,89 +96,93 @@
       border: 1px solid rgba(49, 112, 143, 0.15);
     }
 
+    /* 説明文タイトルと本文 */
     .card h2 {
-      font-size: clamp(15px, 2.2vh, 18px);
+      font-size: clamp(16px, 2.4vh, 20px);
       color: #222;
       margin-bottom: 12px;
       border-bottom: 3px solid var(--main-color);
       padding-bottom: 4px;
       display: inline-block;
     }
-
-    /* 【プロの技】禁止事項カード（赤系の警告スタイルに切り替え） */
-    .card.danger {
-      border: 1px solid rgba(169, 68, 66, 0.2);
-    }
-    .card.danger h2 {
-      color: var(--alert-color);
-      border-bottom: 3px solid var(--alert-color);
-    }
-
-    /* 箇条書きリストのデザイン */
-    .note-list {
-      list-style-type: none;
-    }
-
-    .note-list li {
-      font-size: clamp(13px, 1.8vh, 15px);
+    
+    .card p {
+      font-size: clamp(14px, 1.8vh, 16px);
       line-height: 1.6;
       color: #444;
-      margin-bottom: 10px;
-      padding-left: 1.5em;
-      text-indent: -1.5em;
-    }
-    .note-list li:last-child {
-      margin-bottom: 0;
+      text-align: justify;
     }
 
-    /* 通常の注意事項のアイコン */
-    .card.info .note-list li::before {
-      content: "・";
-      margin-right: 0.5em;
+    /* 重要テキストの強調スタイル */
+    .alert-text {
+      display: block;
+      margin-top: 10px;
+      font-size: clamp(14px, 1.8vh, 16px);
+      font-weight: bold;
+      color: var(--warn-color);
     }
 
-    /* 禁止事項のアイコン */
-    .card.danger .note-list li::before {
-      content: "・";
-      margin-right: 0.5em;
-    }
-
-    /* ボタンコンテナ */
+    /* ボタン・リンクの配置コンテナ */
     .btn-container {
-      margin-top: auto; /* コンテンツが少なくてもボタンを最下部に固定 */
-      padding-top: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    /* 閉じる・戻るボタン */
-    .btn-close {
+    /* ボタンの共通スタイル */
+    .btn {
       display: flex;
       align-items: center;
       justify-content: center;
       width: 100%;
       padding: clamp(12px, 2vh, 16px) 15px;
-      background-color: #666666;
+      background-color: var(--main-color);
       color: #ffffff;
       text-decoration: none;
       border-radius: 10px;
       font-weight: bold;
-      font-size: clamp(14px, 1.8vh, 16px);
+      font-size: clamp(15px, 2vh, 17px);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+      transition: background-color 0.2s, transform 0.1s, opacity 0.2s;
       border: none;
       cursor: pointer;
-      transition: background-color 0.2s, transform 0.1s;
     }
     
+    /* PC表示でのホバー制御 */
     @media (hover: hover) {
-      .btn-close:hover {
-        background-color: #444444;
+      .btn:hover {
+        background-color: var(--main-color-hover);
+        opacity: 0.95;
       }
     }
-    .btn-close:active {
+    /* タップ・クリックした瞬間の縮小エフェクト */
+    .btn:active {
       transform: scale(0.98);
-      background-color: #444444;
+      background-color: var(--main-color-hover);
     }
 
-    /* 横画面スマホ対応の微調整 */
+    /* フォーム用ボタンのカラー適用 */
+    .btn-form {
+      background-color: var(--accent-color);
+    }
+    @media (hover: hover) {
+      .btn-form:hover {
+        background-color: var(--accent-color-hover);
+      }
+    }
+    .btn-form:active {
+      background-color: var(--accent-color-hover);
+    }
+
+    /* 重要ボタン（注意事項など）のカラー適用 */
+    .btn-warn {
+      background-color: var(--warn-color);
+    }
+    .btn-warn:active {
+      background-color: #b52b27;
+    }
+
+    /* 横画面スマホ・極端に高さの低い特殊端末用のブレイクポイント */
     @media (orientation: landscape) and (max-height: 480px) {
       .phone-container {
         max-width: 100%;
@@ -189,42 +204,65 @@
 
   <div class="phone-container">
     <header>
-      <h1>38HR模擬店予約に関する注意事項</h1>
+      <h1>38HR サイト</h1>
     </header>
 
     <div class="main-content">
       
-      <div class="card info">
-        <h2>注意事項</h2>
-        <ul class="note-list">
-          <li>QRコードを添付したメールを無くしますと入場できません。</li>
-          <li><strong>QRコードを読み取ることの出来る</strong>スクリーンショット、印刷物でも受け付けます。</li>
-          <li>決済後の人数変更はできません。追加で新規予約と決済をお願いします。</li>
-          <li>時間指定予約の方は予定時間終了までにいらっしゃらなかった場合、通常の入場券と同等の取扱いになります。その場合の返金はできません。ご了承ください。</li>
-          <li>ライド時間は、1回あたり2,3分程度を目安とさせていただきます。</li>
-          <li><strong>運営都合で</strong>予約キャンセルになる場合は、払戻処理をしますのでPC室前販売所スタッフまでお申し出ください。</li>
-          <li>当模擬店にて、いかなるトラブルがあった場合でも責任を負うことはできません。ご了承ください。</li>
-        </ul>
+      <div class="card">
+        <h2>38HR プロジェクト概要</h2>
+        <p>今年の38HRの模擬店は、ベイマックスのハッピーライドをモチーフとした”38HRいちかわハッピーライド”を実施します！</p>
+        <span class="alert-text">⚠️ 入場には事前登録が必要です。</span>
+      </div>
+     
+      <div class="card">
+        <h2>模擬店時間指定枠の空き状況</h2>
+        <div class="btn-container">
+          <a href="https://wondrous-tanuki-81bb33.netlify.app" target="_blank" class="btn">
+            リアルタイム空き状況を見る
+          </a>
+        </div>
+      </div>
+    
+      <div class="card">
+        <h2>はじめての方へ</h2>
+        <div class="btn-container">
+          <a href="./attention.html" onclick="openRatioWindow(event, 0.8, 0.6)" class="btn btn-warn">
+            予約に関する注意事項 (必ず一読ください)
+          </a>  
+        </div>
       </div>
 
-      <div class="card danger">
-        <h2>禁止事項</h2>
-        <ul class="note-list">
-          <li>アトラクションの特性上、荷物をゴンドラ内に持ち込むことはできません。指定の場所に預けておいてください。</li>
-          <li>スタッフ及び他のお客様のプライバシー保護のため、無許可での撮影はご遠慮ください。</li>
-          <li>展示されているものは特にスタッフの指示がない限り、触れてはいけません。</li>
-          <li><strong>予約システムにおいて不正アクセスや偽造をした場合、法律により罰せられます。</strong></li>
-        </ul>
-      </div>
-
-      <div class="btn-container">
-        <a href="https://yasuhide0926k-cloud.github.io/38hp.github.io/portal" class="btn-close">
-          戻る / 閉じる
-        </a>
+      <div class="card">
+        <h2>事前予約フォーム</h2>
+        <div class="btn-container">
+          <a href="https://forms.gle/9pZqKJtZrYi14Mmp7" target="_blank" class="btn btn-form">
+            時間指定券 予約フォーム
+          </a>
+          <a href="https://forms.gle/k3uBSuKagjvDPqtC6" target="_blank" class="btn btn-form">
+            当日券（予約なし枠）フォーム
+          </a>
+        </div>
       </div>
 
     </div>
   </div>
+
+  <script>
+    function openRatioWindow(event, widthRatio, heightRatio) {
+      event.preventDefault(); // 本来のページ遷移をキャンセル
+  
+      // 画面サイズからピクセル数を計算
+      const w = window.innerWidth * widthRatio;
+      const h = window.innerHeight * heightRatio;
+  
+      // 画面中央に配置するための座標計算
+      const x = (window.innerWidth - w) / 2;
+      const y = (window.innerHeight - h) / 2;
+  
+      window.open(event.currentTarget.href, 'subwin', `width=${w},height=${h},left=${x},top=${y},resizable=yes,scrollbars=yes`);
+    }
+  </script>
 
 </body>
 </html>
