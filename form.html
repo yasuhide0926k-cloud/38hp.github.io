@@ -125,7 +125,12 @@
       btn.innerText = "予約処理中...";
 
       try {
-        const url = `${GAS_URL}?action=reserve&type=${encodeURIComponent(type)}&time=${encodeURIComponent(time)}&count=${count}&email=${encodeURIComponent(email)}`;
+       // 修正後（より安全な形式）
+　　　　const url = GAS_URL + "?action=reserve" + 
+            "&type=" + encodeURIComponent(type) + 
+            "&time=" + encodeURIComponent(time) + 
+            "&count=" + encodeURIComponent(count) + 
+            "&email=" + encodeURIComponent(email);
         const res = await fetch(url);
         const result = await res.json();
 
