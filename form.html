@@ -27,7 +27,13 @@
 
       <div id="time-group" class="mb-3">
         <label class="form-label fw-bold">時間帯</label>
-        <select id="time-select" class="form-select"></select>
+        <select id="time-select" class="form-select">
+          <option value="9:00〜9:45">9:00〜9:45</option>
+          <option value="10:00〜10:45">10:00〜10:45</option>
+          <option value="11:00〜11:45">11:00〜11:45</option>
+          <option value="13:00〜13:45">13:00〜13:45</option>
+          <option value="14:00〜14:45">14:00〜14:45</option>
+        </select>
       </div>
 
       <div class="mb-3">
@@ -50,50 +56,21 @@
   </div>
 
   <script>
-    // ⚠️ いただいたURLをそのままセットしています
+    // 指定いただいたGASのURLをセットしています
     const GAS_URL = "https://script.google.com/macros/s/AKfycbw_v3vt7QpmffCfFLBkqDs0nzy6hTO4WfJqz6dYjEf2xs8KZztgmssxETy9SDj7h648/exec";
-
-    // 画面読み込み時に時間枠を取得
-    async function init() {
-      try {
-        const res = await fetch(GAS_URL + "?action=remaining");
-        const slots = await res.json();
-        const select = document.getElementById('time-select');
-        select.innerHTML = ""; // 初期化
-
-        if (slots.length === 0) {
-          select.innerHTML = '<option value="">設定シートにデータがありません</option>';
-          return;
-        }
-
-        slots.forEach(s => {
-          const opt = document.createElement('option');
-          opt.value = s.time;
-          opt.innerText = `${s.time} (残り ${s.remaining}組)`;
-          if(s.remaining <= 0) opt.disabled = true;
-          select.appendChild(opt);
-        });
-      } catch (e) {
-        console.error(e);
-        document.getElementById('time-select').innerHTML = '<option value="">通信エラーが発生しました</option>';
-      }
-    }
 
     function toggleTime() {
       document.getElementById('time-group').style.display = document.getElementById('t1').checked ? 'block' : 'none';
     }
 
-    // 予約送信
+    // 予約送信（ボタンを押したこの瞬間だけGASと通信します）
     async function submitReservation() {
       const btn = document.getElementById('submit-btn');
       const type = document.querySelector('input[name="type"]:checked').value;
-      const time = document.getElementById('time-select').value;
+      
+      // 「当日一般」の場合は時間帯を「指定なし」にする
+      const time = (type === "予約あり") ? document.getElementById('time-select').value : "指定なし";
       const count = document.getElementById('count-select').value;
-
-      if (type === "予約あり" && (!time || time === "通信エラーが発生しました")) {
-        alert("有効な時間帯が選択されていません。");
-        return;
-      }
 
       btn.disabled = true;
       btn.innerText = "処理中...";
@@ -103,10 +80,11 @@
         type: type,
         time: time,
         count: count,
-        email: "" // 今回はメール機能なし
+        email: "" // メール送信なし
       });
 
       try {
+        // ここで初めてGASのURLを叩きます
         const res = await fetch(GAS_URL + "?" + params.toString());
         const data = await res.json();
 
@@ -116,20 +94,17 @@
           document.getElementById('ticket-id').innerText = "ID: " + data.id;
           document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${data.id}`;
         } else {
-          // もしGAS内部でエラーが起きた場合は、ここで「GAS内部エラー: 〜〜」と表示されます
           alert("予約エラー: " + data.message);
           btn.disabled = false;
           btn.innerText = "予約を確定する";
         }
       } catch (e) {
         console.error(e);
-        alert("通信エラーが発生しました。設定が「全員」になっているか確認してください。");
+        alert("通信エラーが発生しました。しばらく時間を置いてから再度お試しください。");
         btn.disabled = false;
         btn.innerText = "予約を確定する";
       }
     }
-
-    window.onload = init;
   </script>
 </body>
 </html>
