@@ -16,7 +16,7 @@
       <h3 class="text-center fw-bold mb-4">🎫 チケット予約</h3>
       
       <div class="mb-3">
-        <label class="form-label">券種</label>
+        <label class="form-label fw-bold">券種</label>
         <div class="btn-group w-100" role="group">
           <input type="radio" class="btn-check" name="type" id="t1" value="予約あり" checked onchange="toggleTime()">
           <label class="btn btn-outline-primary" for="t1">事前予約</label>
@@ -26,39 +26,46 @@
       </div>
 
       <div id="time-group" class="mb-3">
-        <label class="form-label">時間帯</label>
+        <label class="form-label fw-bold">時間帯</label>
         <select id="time-select" class="form-select"></select>
       </div>
 
       <div class="mb-3">
-        <label class="form-label">人数</label>
+        <label class="form-label fw-bold">人数</label>
         <select id="count-select" class="form-select">
           <option value="1">1名</option>
           <option value="2">2名</option>
         </select>
       </div>
 
-      <button id="submit-btn" class="btn btn-primary w-100 py-2" onclick="submitReservation()">予約を確定する</button>
+      <button id="submit-btn" class="btn btn-primary w-100 py-3 fw-bold" onclick="submitReservation()">予約を確定する</button>
     </div>
 
     <div id="result-section" class="card shadow p-4 text-center" style="display:none;">
-      <h4 class="text-success fw-bold">予約完了！</h4>
-      <p class="text-danger small">※必ずこの画面をスクショしてください</p>
-      <img id="qr-image" class="img-fluid my-3" src="" alt="QRコード">
+      <h4 class="text-success fw-bold">🎉 予約完了！</h4>
+      <p class="text-danger fw-bold small">※必ずこの画面をスクショしてください（再表示できません）</p>
+      <img id="qr-image" class="img-fluid my-3 border p-2" src="" alt="QRコード">
       <div id="ticket-id" class="fs-4 fw-bold"></div>
     </div>
   </div>
 
   <script>
-    // ⚠️ ここに自分のGASウェブアプリURL（/execまで）を貼り付け
+    // ⚠️ いただいたURLをそのままセットしています
     const GAS_URL = "https://script.google.com/macros/s/AKfycbw_v3vt7QpmffCfFLBkqDs0nzy6hTO4WfJqz6dYjEf2xs8KZztgmssxETy9SDj7h648/exec";
 
-    // 画面を開いたときに残数を読み込む処理
+    // 画面読み込み時に時間枠を取得
     async function init() {
       try {
-        const res = await fetch(`${GAS_URL}?action=remaining`);
+        const res = await fetch(GAS_URL + "?action=remaining");
         const slots = await res.json();
         const select = document.getElementById('time-select');
+        select.innerHTML = ""; // 初期化
+
+        if (slots.length === 0) {
+          select.innerHTML = '<option value="">設定シートにデータがありません</option>';
+          return;
+        }
+
         slots.forEach(s => {
           const opt = document.createElement('option');
           opt.value = s.time;
@@ -67,45 +74,56 @@
           select.appendChild(opt);
         });
       } catch (e) {
-        console.error("初期化エラー:", e);
+        console.error(e);
+        document.getElementById('time-select').innerHTML = '<option value="">通信エラーが発生しました</option>';
       }
     }
 
-    // 券種によって時間選択の表示・非表示を切り替える処理
     function toggleTime() {
       document.getElementById('time-group').style.display = document.getElementById('t1').checked ? 'block' : 'none';
     }
 
-    // 予約ボタンを押したときの処理
+    // 予約送信
     async function submitReservation() {
       const btn = document.getElementById('submit-btn');
+      const type = document.querySelector('input[name="type"]:checked').value;
+      const time = document.getElementById('time-select').value;
+      const count = document.getElementById('count-select').value;
+
+      if (type === "予約あり" && (!time || time === "通信エラーが発生しました")) {
+        alert("有効な時間帯が選択されていません。");
+        return;
+      }
+
       btn.disabled = true;
-      btn.innerText = "通信中...";
+      btn.innerText = "処理中...";
 
       const params = new URLSearchParams({
         action: 'reserve',
-        type: document.querySelector('input[name="type"]:checked').value,
-        time: document.getElementById('time-select').value,
-        count: document.getElementById('count-select').value
+        type: type,
+        time: time,
+        count: count,
+        email: "" // 今回はメール機能なし
       });
 
       try {
-        const res = await fetch(`${GAS_URL}?${params.toString()}`);
+        const res = await fetch(GAS_URL + "?" + params.toString());
         const data = await res.json();
 
         if (data.success) {
-          // 予約成功：フォームを隠して結果（QRコード）を表示
           document.getElementById('form-section').style.display = 'none';
           document.getElementById('result-section').style.display = 'block';
           document.getElementById('ticket-id').innerText = "ID: " + data.id;
           document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${data.id}`;
         } else {
-          alert("エラー: " + data.message);
+          // もしGAS内部でエラーが起きた場合は、ここで「GAS内部エラー: 〜〜」と表示されます
+          alert("予約エラー: " + data.message);
+          btn.disabled = false;
+          btn.innerText = "予約を確定する";
         }
       } catch (e) {
         console.error(e);
-        alert("通信エラーが発生しました。");
-      } finally {
+        alert("通信エラーが発生しました。設定が「全員」になっているか確認してください。");
         btn.disabled = false;
         btn.innerText = "予約を確定する";
       }
