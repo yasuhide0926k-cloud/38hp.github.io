@@ -53,53 +53,35 @@
     // ⚠️ ここに自分のGASウェブアプリURL（/execまで）を貼り付け
     const GAS_URL = "https://script.google.com/macros/s/AKfycbw_v3vt7QpmffCfFLBkqDs0nzy6hTO4WfJqz6dYjEf2xs8KZztgmssxETy9SDj7h648/exec";
 
+    // 画面を開いたときに残数を読み込む処理
     async function init() {
-      const res = await fetch(`${GAS_URL}?action=remaining`);
-      const slots = await res.json();
-      const select = document.getElementById('time-select');
-      slots.forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s.time;
-        opt.innerText = `${s.time} (残り ${s.remaining}組)`;
-        if(s.remaining <= 0) opt.disabled = true;
-        select.appendChild(opt);
-      });
+      try {
+        const res = await fetch(`${GAS_URL}?action=remaining`);
+        const slots = await res.json();
+        const select = document.getElementById('time-select');
+        slots.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.time;
+          opt.innerText = `${s.time} (残り ${s.remaining}組)`;
+          if(s.remaining <= 0) opt.disabled = true;
+          select.appendChild(opt);
+        });
+      } catch (e) {
+        console.error("初期化エラー:", e);
+      }
     }
 
+    // 券種によって時間選択の表示・非表示を切り替える処理
     function toggleTime() {
       document.getElementById('time-group').style.display = document.getElementById('t1').checked ? 'block' : 'none';
     }
 
-async function submitReservation() {
-  const btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.innerText = "通信中...";
+    // 予約ボタンを押したときの処理
+    async function submitReservation() {
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerText = "通信中...";
 
-  const params = new URLSearchParams({
-    action: 'reserve',
-    type: document.querySelector('input[name="type"]:checked').value,
-    time: document.getElementById('time-select').value,
-    count: document.getElementById('count-select').value
-  });
-
-  // mode: 'no-cors' ではなくデフォルト(cors)で実行
-  try {
-    const res = await fetch(`${GAS_URL}?${params.toString()}`);
-    const data = await res.json(); // ここでエラーになる場合はGASのCORS設定がまだ適用されていません
-
-    if (data.success) {
-       // 成功時の処理...
-    } else {
-       alert("エラー: " + data.message);
-    }
-  } catch (e) {
-    console.error(e);
-    alert("通信エラーが発生しました。");
-  } finally {
-    btn.disabled = false;
-    btn.innerText = "予約を確定する";
-  }
-}
       const params = new URLSearchParams({
         action: 'reserve',
         type: document.querySelector('input[name="type"]:checked').value,
@@ -107,16 +89,23 @@ async function submitReservation() {
         count: document.getElementById('count-select').value
       });
 
-      const res = await fetch(`${GAS_URL}?${params.toString()}`);
-      const data = await res.json();
+      try {
+        const res = await fetch(`${GAS_URL}?${params.toString()}`);
+        const data = await res.json();
 
-      if (data.success) {
-        document.getElementById('form-section').style.display = 'none';
-        document.getElementById('result-section').style.display = 'block';
-        document.getElementById('ticket-id').innerText = "ID: " + data.id;
-        document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${data.id}`;
-      } else {
-        alert("エラーが発生しました: " + data.message);
+        if (data.success) {
+          // 予約成功：フォームを隠して結果（QRコード）を表示
+          document.getElementById('form-section').style.display = 'none';
+          document.getElementById('result-section').style.display = 'block';
+          document.getElementById('ticket-id').innerText = "ID: " + data.id;
+          document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${data.id}`;
+        } else {
+          alert("エラー: " + data.message);
+        }
+      } catch (e) {
+        console.error(e);
+        alert("通信エラーが発生しました。");
+      } finally {
         btn.disabled = false;
         btn.innerText = "予約を確定する";
       }
