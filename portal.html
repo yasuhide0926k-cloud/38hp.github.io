@@ -10,9 +10,6 @@
   <meta property="og:type" content="website">
 
   <style>
-    /* 【カラーカスタマイズエリア】
-       クラスのテーマカラーに合わせて、ここのカラーコードを自由に変更できます！
-    */
     :root {
       --main-color: #31708f;         /* ヘッダータイトル・詳細ボタン（青系） */
       --main-color-hover: #245269;   /* 詳細ボタンを押したときの色 */
@@ -21,6 +18,7 @@
       --bg-color: #ededf0;           /* PCなどの大画面時に左右に見える背景色 */
       --card-bg: rgba(255, 255, 255, 0.95); /* カードの背景（白・半透明） */
       --warn-color: #d9534f;         /* 警告・重要なお知らせ用の赤系 */
+      --time-color: #f0ad4e;         /* 待ち時間表示用のオレンジ系 */
     }
 
     /* 全体のリセット設定 */
@@ -38,14 +36,14 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      min-height: 100dvh; /* スマホブラウザのツールバー伸縮を完全に吸収する動的単位 */
+      min-height: 100dvh;
       width: 100%;
     }
 
     /* 【画面比率対応】メインコンテナ */
     .phone-container {
       width: 100%;
-      max-width: 480px; /* タブレットやPCで見た時の最大幅 */
+      max-width: 480px;
       min-height: 100vh;
       min-height: 100dvh;
       background-color: #ffffff;
@@ -55,7 +53,7 @@
       position: relative;
     }
 
-    /* ヘッダーエリア：38HR タイトル */
+    /* ヘッダーエリア */
     header {
       background-color: #ffffff;
       padding: clamp(12px, 3vh, 24px) 20px;
@@ -73,10 +71,9 @@
       font-weight: bold;
     }
 
-    /* 写真背景のメインコンテンツエリア */
+    /* メインコンテンツエリア */
     .main-content {
       flex: 1;
-      /* 背景画像（GitHub上の画像パス、または外部URLに差し替えてください） */
       background-image: linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0.2)), url('https://picsum.photos/id/102/1200/1600');
       background-size: cover;
       background-position: center;
@@ -96,7 +93,6 @@
       border: 1px solid rgba(49, 112, 143, 0.15);
     }
 
-    /* 説明文タイトルと本文 */
     .card h2 {
       font-size: clamp(16px, 2.4vh, 20px);
       color: #222;
@@ -113,7 +109,6 @@
       text-align: justify;
     }
 
-    /* 重要テキストの強調スタイル */
     .alert-text {
       display: block;
       margin-top: 10px;
@@ -122,7 +117,20 @@
       color: var(--warn-color);
     }
 
-    /* ボタン・リンクの配置コンテナ */
+    /* 待ち時間表示用の特大デザイン */
+    .waiting-display {
+      text-align: center;
+      padding: 10px 0;
+    }
+    .waiting-time {
+      font-size: clamp(36px, 6vh, 48px);
+      font-weight: 900;
+      color: var(--time-color);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+      margin: 5px 0;
+    }
+
+    /* ボタンコンテナ */
     .btn-container {
       display: flex;
       flex-direction: column;
@@ -148,55 +156,67 @@
       cursor: pointer;
     }
     
-    /* PC表示でのホバー制御 */
     @media (hover: hover) {
-      .btn:hover {
-        background-color: var(--main-color-hover);
-        opacity: 0.95;
-      }
+      .btn:hover { background-color: var(--main-color-hover); opacity: 0.95; }
     }
-    /* タップ・クリックした瞬間の縮小エフェクト */
-    .btn:active {
-      transform: scale(0.98);
-      background-color: var(--main-color-hover);
+    .btn:active { transform: scale(0.98); background-color: var(--main-color-hover); }
+
+    .btn-warn { background-color: var(--warn-color); }
+    .btn-warn:active { background-color: #b52b27; }
+
+    /* 🔒 管理者用隠しエリアのスタイル */
+    .admin-trigger {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .admin-link {
+      font-size: 11px;
+      color: rgba(0, 0, 0, 0.25); /* 目立たない極薄のグレー */
+      text-decoration: none;
+      cursor: pointer;
+      user-select: none;
+    }
+    
+    .admin-panel {
+      display: none; /* 通常は非表示 */
+      background-color: #222;
+      color: #fff;
+      border-radius: 14px;
+      padding: 15px;
+      margin-top: 15px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    }
+    .admin-panel h3 {
+      font-size: 14px;
+      margin-bottom: 10px;
+      color: #f0ad4e;
+      text-align: center;
+    }
+    .grid-inputs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .btn-select-time {
+      background-color: #444;
+      color: #fff;
+      border: 1px solid #555;
+      padding: 8px 4px;
+      font-size: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-select-time:active {
+      background-color: #f0ad4e;
+      color: #222;
     }
 
-    /* フォーム用ボタンのカラー適用 */
-    .btn-form {
-      background-color: var(--accent-color);
-    }
-    @media (hover: hover) {
-      .btn-form:hover {
-        background-color: var(--accent-color-hover);
-      }
-    }
-    .btn-form:active {
-      background-color: var(--accent-color-hover);
-    }
-
-    /* 重要ボタン（注意事項など）のカラー適用 */
-    .btn-warn {
-      background-color: var(--warn-color);
-    }
-    .btn-warn:active {
-      background-color: #b52b27;
-    }
-
-    /* 横画面スマホ・極端に高さの低い特殊端末用のブレイクポイント */
     @media (orientation: landscape) and (max-height: 480px) {
-      .phone-container {
-        max-width: 100%;
-      }
-      header {
-        padding: 8px 20px;
-      }
-      .main-content {
-        padding: 15px;
-        gap: 15px;
-      }
-      .card {
-        padding: 15px;
-      }
+      .phone-container { max-width: 100%; }
+      header { padding: 8px 20px; }
+      .main-content { padding: 15px; gap: 15px; }
+      .card { padding: 15px; }
     }
   </style>
 </head>
@@ -225,11 +245,34 @@
       </div>
 
       <div class="card">
-        <h2>事前予約フォーム</h2>
-        <div class="btn-container">
-          <a href="./form.html" target="_blank" class="btn btn-form">
-            予約フォーム
-          </a>
+        <h2>現在のアナログ待ち時間</h2>
+        <div class="waiting-display">
+          <p>ただいまの待ち時間の目安は</p>
+          <div class="waiting-time" id="current-wait">5分未満</div>
+          <p>となっております。</p>
+        </div>
+      </div>
+
+      <div class="admin-trigger">
+        <span class="admin-link" onclick="checkAdminPassword()">⚙️ 管理者ログイン</span>
+      </div>
+
+      <div class="admin-panel" id="admin-panel">
+        <h3>【管理者用】待ち時間変更パネル</h3>
+        <div class="grid-inputs">
+          <button class="btn-select-time" onclick="setWaitingTime('5分未満')">5分未満</button>
+          <button class="btn-select-time" onclick="setWaitingTime('5分')">5分</button>
+          <button class="btn-select-time" onclick="setWaitingTime('10分')">10分</button>
+          <button class="btn-select-time" onclick="setWaitingTime('15分')">15分</button>
+          <button class="btn-select-time" onclick="setWaitingTime('20分')">20分</button>
+          <button class="btn-select-time" onclick="setWaitingTime('25分')">25分</button>
+          <button class="btn-select-time" onclick="setWaitingTime('30分')">30分</button>
+          <button class="btn-select-time" onclick="setWaitingTime('35分')">35分</button>
+          <button class="btn-select-time" onclick="setWaitingTime('40分')">40分</button>
+          <button class="btn-select-time" onclick="setWaitingTime('45分')">45分</button>
+          <button class="btn-select-time" onclick="setWaitingTime('50分')">50分</button>
+          <button class="btn-select-time" onclick="setWaitingTime('55分')">55分</button>
+          <button class="btn-select-time" style="grid-column: span 3; background-color: #d9534f;" onclick="setWaitingTime('60分以上待ち')">⚠️ 60分以上待ち</button>
         </div>
       </div>
 
@@ -237,18 +280,47 @@
   </div>
 
   <script>
+    // 注意事項をポップアップで開く設定
     function openRatioWindow(event, widthRatio, heightRatio) {
-      event.preventDefault(); // 本来のページ遷移をキャンセル
-  
-      // 画面サイズからピクセル数を計算
+      event.preventDefault();
       const w = window.innerWidth * widthRatio;
       const h = window.innerHeight * heightRatio;
-  
-      // 画面中央に配置するための座標計算
       const x = (window.innerWidth - w) / 2;
       const y = (window.innerHeight - h) / 2;
-  
       window.open(event.currentTarget.href, 'subwin', `width=${w},height=${h},left=${x},top=${y},resizable=yes,scrollbars=yes`);
+    }
+
+    // 🔑 【管理者認証】パスワードの設定（自由に変更してください）
+    const ADMIN_PASSWORD = "38yappy";
+
+    // ページを読み込んだ時に、保存されている待ち時間があれば適用する
+    window.onload = function() {
+      const savedTime = localStorage.getItem("38hr_waiting_time");
+      if (savedTime) {
+        document.getElementById("current-wait").innerText = savedTime;
+      }
+    };
+
+    // パスワード入力の処理
+    function checkAdminPassword() {
+      const input = prompt("管理者のパスワードを入力してください：");
+      if (input === ADMIN_PASSWORD) {
+        alert("認証に成功しました。変更パネルを表示します。");
+        document.getElementById("admin-panel").style.display = "block";
+        // 画面を一番下まで自動スクロールさせてパネルを見せる
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      } else if (input !== null) {
+        alert("パスワードが違います。");
+      }
+    }
+
+    // 待ち時間を書き換えてブラウザに記憶する処理
+    function setWaitingTime(timeString) {
+      // 画面上の文字を書き換え
+      document.getElementById("current-wait").innerText = timeString;
+      // スマホのブラウザに状態を記憶
+      localStorage.setItem("38hr_waiting_time", timeString);
+      alert("待ち時間を【 " + timeString + " 】に変更しました！");
     }
   </script>
 
