@@ -71,10 +71,9 @@
       font-weight: bold;
     }
 
- /* メインコンテンツエリア */
+    /* メインコンテンツエリア */
     .main-content {
       flex: 1;
-      /* ↓ サムネイル生成用のURLに変更しています ↓ */
       background-image: linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0.2)), url('https://drive.google.com/thumbnail?id=1Ov2k8IDo0BSfc4VmGOzNiP4hboT3yg5J&sz=w1200');
       background-size: cover;
       background-position: center;
@@ -212,6 +211,11 @@
       background-color: #f0ad4e;
       color: #222;
     }
+    /* 通信中の連打防止デザイン */
+    .btn-select-time:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
 
     @media (orientation: landscape) and (max-height: 480px) {
       .phone-container { max-width: 100%; }
@@ -234,7 +238,6 @@
         <h2>38HR 模擬店概要</h2>
         <p>今年の38HRの模擬店は、ベイマックスのハッピーライドをモチーフとした”38HRいちかわハッピーライド”！</p>
         <p>なんか「いち」ばん「かわ」ってる先生、「いちかわ」の手作りコーヒーカップ！</p>
-        <p>１０時から30分間サイトのメンテナンスを行います。その際極力アクセスをしないようにして下さい</p>
       </div>
 
       <div class="card">
@@ -249,7 +252,7 @@
         <h2>現在の予想待ち時間</h2>
         <div class="waiting-display">
           <p>ただいまの待ち時間の目安は</p>
-          <div class="waiting-time" id="current-wait">45分</div>
+          <div class="waiting-time" id="current-wait">読込中...</div>
           <p>となっております。</p>
         </div>
       </div>
@@ -291,15 +294,27 @@
       window.open(event.currentTarget.href, 'subwin', `width=${w},height=${h},left=${x},top=${y},resizable=yes,scrollbars=yes`);
     }
 
-    // 🔑 【管理者認証】パスワードの設定（自由に変更してください）
+    // 🔗 【重要】ここにステップ1で作ったGASのURLを貼り付けてください！
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxqy8CTh9RYcZpVsgiMc0lELghNnEDTfAhIyxFfHna5jLKz841hIFtfwoQw50raqro6/exec";
+    
+    // 🔑 管理者パスワード
     const ADMIN_PASSWORD = "38yappy";
 
-    // ページを読み込んだ時に、保存されている待ち時間があれば適用する
+    // ページを読み込んだ時に、クラウドから最新の待ち時間を取得する
     window.onload = function() {
-      const savedTime = localStorage.getItem("38hr_waiting_time");
-      if (savedTime) {
-        document.getElementById("current-wait").innerText = savedTime;
-      }
+      fetch(`${GAS_API_URL}?action=get`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "success") {
+            document.getElementById("current-wait").innerText = data.time;
+          } else {
+            document.getElementById("current-wait").innerText = "取得エラー";
+          }
+        })
+        .catch(error => {
+          console.error("通信エラー:", error);
+          document.getElementById("current-wait").innerText = "通信エラー";
+        });
     };
 
     // パスワード入力の処理
@@ -308,20 +323,39 @@
       if (input === ADMIN_PASSWORD) {
         alert("認証に成功しました。変更パネルを表示します。");
         document.getElementById("admin-panel").style.display = "block";
-        // 画面を一番下まで自動スクロールさせてパネルを見せる
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
       } else if (input !== null) {
         alert("パスワードが違います。");
       }
     }
 
-    // 待ち時間を書き換えてブラウザに記憶する処理
+    // クラウド（スプレッドシート）上の待ち時間を書き換える処理
     function setWaitingTime(timeString) {
-      // 画面上の文字を書き換え
-      document.getElementById("current-wait").innerText = timeString;
-      // スマホのブラウザに状態を記憶
-      localStorage.setItem("38hr_waiting_time", timeString);
-      alert("待ち時間を【 " + timeString + " 】に変更しました！");
+      // 通信中のボタン連打を防止
+      const buttons = document.querySelectorAll('.btn-select-time');
+      buttons.forEach(btn => btn.disabled = true);
+      document.getElementById("current-wait").innerText = "更新中...";
+
+      // GASにデータを送信して書き換え
+      fetch(`${GAS_API_URL}?action=set&time=${encodeURIComponent(timeString)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "success") {
+            document.getElementById("current-wait").innerText = data.time;
+            alert("待ち時間を【 " + data.time + " 】に変更し、全員の画面へ反映しました！");
+          } else {
+            alert("更新に失敗しました。");
+          }
+        })
+        .catch(error => {
+          console.error("更新エラー:", error);
+          alert("通信エラーが発生しました。");
+          document.getElementById("current-wait").innerText = "エラー";
+        })
+        .finally(() => {
+          // 通信が終わったらボタンを再び押せるようにする
+          buttons.forEach(btn => btn.disabled = false);
+        });
     }
   </script>
 
